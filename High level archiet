@@ -1,0 +1,17 @@
+Client
+   |
+Load Balancer
+   |
+API Servers
+   |
+---------------------------
+| User Service            |
+| Tweet Service           |
+| Follow Service          |
+| Feed Service            |
+---------------------------
+   |
+Databases
+Cache (Redis)
+Message Queue (Kafka)
+Object Storage (media)
