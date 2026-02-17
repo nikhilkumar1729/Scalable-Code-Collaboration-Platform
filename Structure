@@ -1,0 +1,32 @@
+twitter-clone/
+│
+├── gateway/
+│   └── server.js
+│
+├── services/
+│   ├── auth/
+│   │   ├── controller.js
+│   │   ├── routes.js
+│   │   └── service.js
+│   │
+│   ├── tweet/
+│   │   ├── controller.js
+│   │   ├── routes.js
+│   │   └── service.js
+│   │
+│   ├── feed/
+│   │   ├── controller.js
+│   │   ├── routes.js
+│   │   └── service.js
+│   │
+│   └── follow/
+│       ├── controller.js
+│       ├── routes.js
+│       └── service.js
+│
+├── shared/
+│   ├── db.js
+│   ├── redis.js
+│   └── middleware.js
+│
+└── docker-compose.yml
