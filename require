@@ -8,27 +8,21 @@ const jwt = require("jsonwebtoken");
 const { Pool } = require("pg");
 const redis = require("redis");
 
-// -------------------------
-// App Initialization
-// -------------------------
+
 const app = express();
 app.use(express.json());
 app.use(helmet());
 app.use(cors());
 app.use(morgan("combined"));
 
-// -------------------------
-// Rate Limiting
-// -------------------------
+
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 1000,
 });
 app.use(limiter);
 
-// -------------------------
-// PostgreSQL Setup
-// -------------------------
+
 const pool = new Pool({
   user: process.env.DB_USER || "postgres",
   host: process.env.DB_HOST || "localhost",
@@ -41,9 +35,7 @@ pool.on("connect", () => {
   console.log("Connected to PostgreSQL");
 });
 
-// -------------------------
-// Redis Setup
-// -------------------------
+
 const redisClient = redis.createClient({
   url: process.env.REDIS_URL || "redis://localhost:6379",
 });
@@ -52,9 +44,6 @@ redisClient.connect()
   .then(() => console.log("Connected to Redis"))
   .catch(console.error);
 
-// -------------------------
-// Auth Middleware
-// -------------------------
 function authenticate(req, res, next) {
   const token = req.headers["authorization"];
   if (!token) return res.status(401).json({ message: "No token provided" });
@@ -68,9 +57,7 @@ function authenticate(req, res, next) {
   }
 }
 
-// -------------------------
-// Health Check
-// -------------------------
+
 app.get("/health", async (req, res) => {
   try {
     await pool.query("SELECT 1");
@@ -80,9 +67,7 @@ app.get("/health", async (req, res) => {
   }
 });
 
-// -------------------------
-// Auth Routes
-// -------------------------
+
 app.post("/register", async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -124,9 +109,6 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// -------------------------
-// Post Tweet
-// -------------------------
 app.post("/tweet", authenticate, async (req, res) => {
   const { content } = req.body;
 
@@ -144,9 +126,7 @@ app.post("/tweet", authenticate, async (req, res) => {
   }
 });
 
-// -------------------------
-// Get Feed
-// -------------------------
+
 app.get("/feed", authenticate, async (req, res) => {
   try {
     const cacheKey = `feed:${req.user.id}`;
@@ -169,9 +149,7 @@ app.get("/feed", authenticate, async (req, res) => {
   }
 });
 
-// -------------------------
-// Follow User
-// -------------------------
+
 app.post("/follow/:userId", authenticate, async (req, res) => {
   try {
     await pool.query(
@@ -185,17 +163,13 @@ app.post("/follow/:userId", authenticate, async (req, res) => {
   }
 });
 
-// -------------------------
-// Global Error Handler
-// -------------------------
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: "Internal Server Error" });
 });
 
-// -------------------------
-// Graceful Shutdown
-// -------------------------
+
 process.on("SIGINT", async () => {
   console.log("Shutting down...");
   await pool.end();
@@ -203,9 +177,7 @@ process.on("SIGINT", async () => {
   process.exit(0);
 });
 
-// -------------------------
-// Start Server
-// -------------------------
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
